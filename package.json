@@ -1,7 +1,7 @@
 {
-  "name": "html5-qrcode",
+  "name": "@part-db/html5-qrcode",
   "version": "3.0.0",
-  "description": "A cross platform HTML5 QR Code & bar code scanner",
+  "description": "A cross platform HTML5 QR Code & bar code scanner (forked for Part-DB)",
   "main": "./cjs/index.js",
   "module": "./esm/index.js",
   "typings": "./esm/index.d.ts",

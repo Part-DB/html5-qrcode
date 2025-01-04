@@ -16,7 +16,6 @@ import {
     RobustQrcodeDecoderAsync,
 } from "./core";
 
-import { ZXingHtml5QrcodeDecoder } from "./zxing-html5-qrcode-decoder";
 import { BarcodeDetectorDelegate } from "./native-bar-code-detector";
 
 /**
@@ -37,25 +36,18 @@ export class Html5QrcodeShim implements RobustQrcodeDecoderAsync {
 
     public constructor(
         requestedFormats: Array<Html5QrcodeSupportedFormats>,
-        useBarCodeDetectorIfSupported: boolean,
         verbose: boolean,
         logger: Logger) {
         this.verbose = verbose;
 
-        // Use BarcodeDetector library if enabled by config and is supported.
-        if (useBarCodeDetectorIfSupported
-                && BarcodeDetectorDelegate.isSupported()) {
-            this.primaryDecoder = new BarcodeDetectorDelegate(
-                requestedFormats, verbose, logger);
-            // If 'BarcodeDetector' is supported, the library will alternate
-            // between 'BarcodeDetector' and 'zxing-js' to compensate for
-            // quality gaps between the two.
-            this.secondaryDecoder = new ZXingHtml5QrcodeDecoder(
-                requestedFormats, verbose, logger);
-        } else {
-            this.primaryDecoder = new ZXingHtml5QrcodeDecoder(
-                requestedFormats, verbose, logger);
+        if (!BarcodeDetectorDelegate.isSupported()) {
+            throw new Error("BarcodeDetector is not supported by this browser. Use Polyfill if required!");
         }
+
+        //Always use BarcodeDetector, as we removed the zxing-js library.
+        this.primaryDecoder = new BarcodeDetectorDelegate(
+            requestedFormats, verbose, logger);
+
     }
 
     async decodeAsync(canvas: HTMLCanvasElement): Promise<QrcodeResult> {

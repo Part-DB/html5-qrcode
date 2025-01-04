@@ -330,7 +330,6 @@ export class Html5Qrcode {
         this.logger = new BaseLoggger(this.verbose);
         this.qrcode = new Html5QrcodeShim(
             this.getSupportedFormats(configOrVerbosityFlag),
-            this.getUseBarCodeDetectorIfSupported(configObject),
             this.verbose,
             this.logger);
 

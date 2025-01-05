@@ -40,14 +40,20 @@ export class Html5QrcodeShim implements RobustQrcodeDecoderAsync {
         logger: Logger) {
         this.verbose = verbose;
 
-        if (!BarcodeDetectorDelegate.isSupported()) {
-            throw new Error("BarcodeDetector is not supported by this browser. Use Polyfill if required!");
+        //If native BarcodeDetector is supported, use it as primary decoder and polyfill as secondary.
+        if (BarcodeDetectorDelegate.isNativeSupported()) {
+            logger.log("Native BarcodeDetector is supported, using it as primary decoder.");
+
+            this.primaryDecoder = new BarcodeDetectorDelegate(
+                requestedFormats, verbose, logger);
+            this.secondaryDecoder = new BarcodeDetectorDelegate(
+                requestedFormats, verbose, logger, true);
+        } else { //Otherwise use polyfill as primary decoder.
+            logger.log("Native BarcodeDetector is not supported, using polyfill as primary decoder.");
+
+            this.primaryDecoder = new BarcodeDetectorDelegate(
+                requestedFormats, verbose, logger, true);
         }
-
-        //Always use BarcodeDetector, as we removed the zxing-js library.
-        this.primaryDecoder = new BarcodeDetectorDelegate(
-            requestedFormats, verbose, logger);
-
     }
 
     async decodeAsync(canvas: HTMLCanvasElement): Promise<QrcodeResult> {

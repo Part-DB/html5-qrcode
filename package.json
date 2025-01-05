@@ -1,6 +1,6 @@
 {
   "name": "@part-db/html5-qrcode",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "description": "A cross platform HTML5 QR Code & bar code scanner (forked for Part-DB)",
   "main": "./cjs/index.js",
   "module": "./esm/index.js",
@@ -89,5 +89,8 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "barcode-detector": "^2.3.1"
   }
 }

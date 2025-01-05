@@ -20,6 +20,9 @@ import {
     Logger
 } from "./core";
 
+//@ts-ignore
+import { BarcodeDetector as BarcodeDetectorPolyfill } from "barcode-detector/pure";
+
 declare const BarcodeDetector: any;
 
 /** Config for BarcodeDetector API. */
@@ -98,7 +101,7 @@ interface BarcodeDetectorResult {
      * getSupportedFormats() API.
      * @returns 
      */
-    public static isSupported(): boolean {
+    public static isNativeSupported(): boolean {
         if (!("BarcodeDetector" in window)) {
             return false;
         }
@@ -109,17 +112,22 @@ interface BarcodeDetectorResult {
     public constructor(
         requestedFormats: Array<Html5QrcodeSupportedFormats>,
         verbose: boolean,
-        logger: Logger) {
-        if (!BarcodeDetectorDelegate.isSupported()) {
-            throw "Use html5qrcode.min.js without edit, Use "
-                + "BarcodeDetectorDelegate only if it isSupported();";
+        logger: Logger,
+        usePolyfill: boolean = false,
+        ) {
+        if (!usePolyfill && !BarcodeDetectorDelegate.isNativeSupported()) {
+            throw "BarcodeDetector is not supported natively by this browser. Use Polyfill by setting usePolyfill to true!";
         }
         this.verbose = verbose;
         this.logger = logger;
 
         // create new detector
         const formats = this.createBarcodeDetectorFormats(requestedFormats);
-        this.detector = new BarcodeDetector(formats);
+        if (!usePolyfill) { //Use the native version
+            this.detector = new BarcodeDetector(formats);
+        } else { //Otherwise use the polyfill
+            this.detector = new BarcodeDetectorPolyfill(formats);
+        }
 
         // check compatibility
         if (!this.detector) {
